@@ -1,0 +1,77 @@
+Anshika Gupta
+Lucknow | ganshika7677@gmail.com | 8299182673 |linkedin.com/in/anshika-gupta-2a55221a5
+Objective
+Proficient in Power BI, SQL, AWS Redshift, and data visualization, with skills in ETL workflows, data modeling,
+and performance optimization. Skilled in migrating reporting systems, automating reports, and enhancing data
+accuracy to support data-driven decision-making. Experienced in database performance tuning, dashboard
+development, and Agile methodologies (JIRA, Confluence, Kanban) for efficient project execution and stakeholder
+collaboration.
+Technologies
+BI & Reporting Tools: Power BI(Desktop, Service, Report Server, Dataflows, DAX, Power Query M, Report
+Builder), SAP BO, Tableau
+Programming & Scripting : SQL, Python
+Databases : Oracle, Amazon Redshift, SQL Server
+Cloud Platforms & Services : AWS (Redshift, Glue, S3, Athena)
+ETL & Data Processing : AWS Glue, Apache Airflow(DAG Monitoring)
+Collaboration & Devops tools : JIRA, Confluence, Kanban, Bitbucket, SonarQube
+Experience
+System Engineer , Tata Consultancy Services
+February 2022 – Present
+• Experienced in HR, Finance, and BBS domains as a Data Analyst and Power BI Developer delivering impactful
+data solutions and business insights.
+• Successfully migrated reporting systems from SAP BO to Power BI, improving analytics and report performance
+by 30%.
+• Designed and implemented Power BI Dataflows and reusable datasets, which were used to create multiple
+consistent and high-performance reports.
+• Evaluated and mapped data for Oracle to Amazon Redshift migration, achieving 100% seamless data transition.
+• Developed and optimized 40+ Power BI reports (Desktop, Gateway, Service, Report Server, Report Builder)
+including Paginated Reports, increasing reporting efficiency by 25%.
+• Created, managed, and maintained SQL queries, stored procedures, tables, views, and scripts to support data
+extraction and reporting.
+• Managed and monitored ETL pipelines using AWS Glue and Apache Airflow, including continuous DAG
+monitoring for reliable data processing.
+• Used Amazon Athena and S3 for data storage and fast querying with 98% data availability.
+• Worked on Bitbucket for version control—managed repos, pushed production files, built pipelines, and ensured
+code quality with SonarQube.
+• Used JIRA, Confluence, and Kanban boards for Agile project management with a 90% success rate in sprint
+deliveries.
+• Skilled in Power Query M, DAX, data modeling, cleansing, and transformation for generating optimized business
+insights.
+Analyst, Cognizant
+Aug 2021 – Feb 2022
+• Led cloud cost optimization for AWS & Azure, reducing expenses by eliminating inefficiencies.
+• Developed cost-saving strategies aligned with client budgets.
+• Presented reports to management, influencing strategic decisions.
+Projects
+Project 1 : SAP BO to Power BI Migration
+• Led the migration of existing SAP BO reports to Power BI, ensuring complete functional and visual parity.
+• Worked closely with the business teams to gather new reporting requirements and developed reports from
+scratch.
+• Built detailed Power BI datasets with proper relationships, hierarchies, and DAX measures, reused across
+multiple reports.
+• Created Paginated Reports using Power BI Report Builder and integrated with Power BI Service.
+• Designed datasets and calculated columns/measures using Power Query M and DAX.
+• Worked with stakeholders for UAT, requirement gathering, testing, final deployment and documentation for
+knowledge transfer.
+• Managed report deployment using Power BI gateway and schedules refreshes.
+Project 2 : Oracle to Redshift Migration
+• Worked on data migration project from Oracle to Amazon Redshift, including data mapping, validation, and
+transformation.
+• Designed Redshift schemas, tables, views, stored procedures, supporting downstream reporting and analytics.
+• Developed ETL pipelines using AWS Glue and Apache Airflow, and actively monitored DAG executions and
+failures.
+• Integrated Redshift and Athena with Power BI to create interactive dashboards and reports using real-time data.
+• Used Amazon Athena and S3 for building ad-hoc reports and data querying.
+• Responsible for data transformation, validation and reporting.
+• Worked in Bitbucket to manage code versioning—created repositories, pushed production scripts, built
+pipelines, and integrated with SonarQube for code quality analysis.
+Education
+University Institute of Engineering & Technology, B.Tech in Electronics and
+Communication Engineering
+Jul 2016 – Sept 2020
+• CPI: 7.25/10
+Certifications / Achievements
+Microsoft Certified: Power BI Associate Certification : Earned certification as a Microsoft Power BI Associate.
+AWS Certified Cloud Practitioner : Knowledge of AWS cloud services.
+On-the-Spot Awards : Received four "On-the-Spot Awards" for exceptional performance and contributions.
+Best Team Award : Received "Best Team Award" for outstanding team collaboration and results.

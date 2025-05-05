@@ -1,0 +1,90 @@
+Last Updated on 12th February 2025
+Akash Gupta
+Software Developer
+7398699438 | gakashw@gmail.com
+SKILLS
+• JavaScript •Express.js • Node.Js
+• MySql • MongoDB • Redis
+• REST APIs • Docker • AWS
+• GitHub • ElasticSearch • EC2
+• S3 • Jest • Postman
+COURSEWORK
+Web Development
+Database Management System
+Data Structures & Algorithms
+Software Methodology
+Artificial Intelligence
+Operating System
+CERTIFICATION
+Data Modeling and Database De-
+sign Development
+Lernovate Training Program for
+Soft Skills and Machine Learning
+The Complete Introduction to SQL
+programming
+HCLTECH Level 1 SD PBT Program
+by SkillSoft
+EDUCATION
+BBD University
+Bachelor of Computer Application
+August 2023 | Lucknow, IND
+Florence Nightingle Inter
+College
+Senior Secondary
+Grad. May 2020 | Lucknow, IND
+Florence Nightingle Inter
+College
+Secondary
+Grad. May 2018 | Lucknow, IND
+LINKS
+Github:// gakash90
+LinkedIn:// AkashGupta
+Leetcode:// AkashGupta
+EXPERIENCE
+ZFINTECH PVT LTD | Software Developer
+May – Present | Lucknow, IND
+• Designed and developed scalable backend services for a dynamic QR code
+generation and analytics platform, managing the entire backend infrastructure
+to ensure high performance, availability, and minimal downtime.
+• Implemented dynamic QR codes with real-time content management and
+slot-based redirection, providing businesses with the ability to instantly change
+the content linked to their QR codes, optimizing their marketing flexibility.
+• Developed and optimized real-time analytics for QR code usage, allowing
+businesses to track engagement, performance, and conversions, enabling
+data-driven decision-making for marketing campaigns.
+• Implemented secure user authentication and transaction management
+systems, ensuring that real estate transactions were conducted seamlessly and
+securely, with the ability to manage property investments across different
+ownership structures.
+18PIXELS PVT LTD
+| Associate Software Developer
+Jan 2024– May 2024 | Lucknow , IND
+• Designed and developed RESTful APIs to support core platform functionality,
+facilitating seamless and efficient communication between client-side
+interfaces and server-side logic.
+• Enhanced backend performance by optimizing database queries and improving
+API response times, achieving a 20 % reduction in data retrieval latency and
+delivering a smoother user experience.
+• Integrated external APIs for payment gateways and third-party services,
+automating workflows, ensuring secure transactions, and minimizing manual
+interventions to enhance overall system reliability.
+THE RUBIXCON | Junior Software Developer
+March 2022 – Sep 2023 | Lucknow, IND
+• Implemented and optimized backend operations for various application
+modules, ensuring seamless integration with databases and enhancing data
+flow efficiency across distributed systems.
+• Developed a deep understanding of the Software Development Life Cycle
+(SDLC) by actively contributing to all stages, including requirement analysis,
+development, testing, deployment, and post-release maintenance, enabling
+smooth project delivery.
+• Conducted and participated in code reviews to enforce best practices in code
+quality, modular structure, and maintainability, resulting in scalable and robust
+applications.
+• Integrated external APIs for payment gateways and third-party services,
+automating workflows, ensuring secure transactions, and minimizing manual
+interventions to enhance overall system reliability.
+WORKSHOPS
+Completed Software Development training through Percipio (Skillsoft), gaining
+expertise in Software Development Principles and Design Patterns
+Attended IBM AI Learning workshop, gaining hands-on experience in artificial
+intelligence concepts, machine learning algorithms, and AI development tools

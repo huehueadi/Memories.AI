@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user
-from services import get_collection, process_memory, allowed_file, detect_file_type
+from services import get_collection, process_memory, allowed_file, detect_file_type, delete_memory
 
 memory_bp = Blueprint('memory', __name__, url_prefix='/api/collections')
 
@@ -71,4 +71,22 @@ def get_memory(collection_id, memory_id):
     return jsonify({
         "success": True,
         "memory": memory
+    })
+
+@memory_bp.route('/<collection_id>/memories/<memory_id>', methods=['DELETE'])
+@login_required
+def delete_memory_route(collection_id, memory_id):
+    collection = get_collection(current_user.id, collection_id)
+    if not collection:
+        return jsonify({"success": False, "error": "Collection not found"}), 404
+    
+    # Add a delete_memory function to your services.py file
+    success, error = delete_memory(current_user.id, collection_id, memory_id)
+    
+    if not success:
+        return jsonify({"success": False, "error": error}), 500
+    
+    return jsonify({
+        "success": True,
+        "message": "Memory deleted successfully"
     })

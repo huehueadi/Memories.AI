@@ -1,13 +1,11 @@
-
 from models import Chat, ChatMessage
 from extensions import db
 from services import query_collection, get_collection, generate_response, get_collection_documents_path ,query_specific_memory
-
+from diary_services import get_diary, get_diary_with_entries  # Add get_diary_with_entries
 from datetime import datetime
 import ollama
 import numpy as np
 import os
-
 
 def query_specific_memory(user_id, collection_id, memory_id, query_text):
     """Query a specific memory with a question"""
@@ -107,10 +105,6 @@ def create_chat_session(user_id, collection_id):
     except Exception as e:
         db.session.rollback()
         return None, str(e)
-
-
-
-
 
 def get_chat_sessions(user_id, collection_id=None):
     """Get all chat sessions for a user, optionally filtered by collection"""
@@ -307,3 +301,110 @@ def process_memory_chat_query(chat_id, user_id, query_text):
         import traceback
         print(f"DEBUG: Traceback: {traceback.format_exc()}")
         return None, str(e)
+
+def create_diary_chat_session(user_id, diary_id):
+    """Create a new chat session for a specific diary"""
+    from diary_services import get_diary
+    
+    diary = get_diary(user_id, diary_id)
+    if not diary:
+        return None, "Diary not found"
+    
+    chat = Chat(
+        user_id=user_id,
+        diary_id=diary_id,
+        title=f"Chat with {diary['name']}",
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow()
+    )
+    
+    try:
+        db.session.add(chat)
+        db.session.commit()
+        return chat, None
+    except Exception as e:
+        db.session.rollback()
+        return None, str(e)
+
+def get_diary_chat_sessions(user_id, diary_id):
+    """Get all chat sessions for a user and diary"""
+    return Chat.query.filter_by(user_id=user_id, diary_id=diary_id).order_by(Chat.updated_at.desc()).all()
+
+
+def process_diary_chat_query(chat_id, user_id, query_text):
+    """Process a user query for a diary chat"""
+    chat = Chat.query.filter_by(id=chat_id, user_id=user_id).first()
+    if not chat:
+        return None, "Chat session not found"
+    
+    if not chat.diary_id:
+        return None, "This is not a diary chat"
+    
+    user_message, error = add_message_to_chat(chat_id, user_id, query_text, is_user=True)
+    if error:
+        return None, error
+    
+    
+    diary_data = get_diary_with_entries(user_id, chat.diary_id)
+    if not diary_data:
+        return None, "Diary not found"
+
+    entries_text = ""
+    relevant_entry_ids = []
+    
+    for entry in diary_data.get("entries", []):
+        entry_id = entry["id"]
+        entry_text = f"Entry from {entry['created_at']}, Title: {entry['title']}\n{entry['text']}"
+        if entry.get('caption'):
+            entry_text += f"\nCaption: {entry['caption']}"
+        
+        entries_text += f"\n--- ENTRY {entry_id} ---\n{entry_text}\n"
+        relevant_entry_ids.append(entry_id)
+    
+    # Generate response
+    response_text = ""
+    if entries_text:
+        # Use ollama to generate response
+        prompt = f"""
+        You are an AI assistant that helps users interact with their personal diary.
+        Based on the following diary entries and the user's question, provide a helpful response.
+        
+        Diary entries: 
+        {entries_text}
+        
+        User question: {query_text}
+        
+        Your response should include references to the specific diary entries you're using to answer.
+        Your response:
+        """
+        
+        try:
+            output = ollama.generate(
+                model="llama3",
+                prompt=prompt
+            )
+            response_text = output['response']
+        except Exception as e:
+            print(f"Error generating response: {e}")
+            response_text = f"I had trouble processing your question about your diary. Technical error: {str(e)}"
+    else:
+        response_text = "I don't see any entries in your diary yet. Add some entries and then we can chat about them!"
+    
+    # Store the AI message
+    ai_message, error = add_message_to_chat(
+        chat_id, 
+        user_id, 
+        response_text, 
+        is_user=False,
+        relevant_memory_ids=",".join(map(str, relevant_entry_ids))
+    )
+    
+    if error:
+        return None, error
+    
+    return {
+        "query": query_text,
+        "response": response_text,
+        "relevant_entries": diary_data.get("entries", [])
+    }, None
+

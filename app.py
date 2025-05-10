@@ -1,21 +1,19 @@
-
 import os
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 
 from flask import Flask, redirect, url_for, send_from_directory, jsonify
 from flask_login import login_required, current_user
 from services import get_collection
-
-
+from diary_blueprint import diary_bp
 
 from extensions import db, login_manager
 from auth_blueprint import auth_bp
 from collections_blueprint import collections_bp
 from memory_blueprint import memory_bp
-from chat_blueprint import chat_bp, general_chat_bp
+from chat_blueprint import chat_bp, general_chat_bp, diary_chat_bp
 from model_download import model_download_bp
 from model_downloader import model_downloader_bp
-
+from upload_blueprint import upload_bp
 
 
 def create_app():
@@ -30,6 +28,9 @@ def create_app():
     login_manager.login_view = 'auth.login'
     
     app.register_blueprint(auth_bp)
+    app.register_blueprint(diary_chat_bp)
+
+    app.register_blueprint(upload_bp)
     app.register_blueprint(collections_bp)
     app.register_blueprint(memory_bp)
     app.register_blueprint(chat_bp)
@@ -38,6 +39,10 @@ def create_app():
 
     app.register_blueprint(model_download_bp)
     app.register_blueprint(model_downloader_bp)
+    app.register_blueprint(diary_bp)
+
+
+    
 
     
     with app.app_context():
@@ -97,9 +102,61 @@ def create_app():
         # Additional check for memory existence could be added here
         
         return send_from_directory('static', 'chat-view.html')
+    
+
+    @app.route('/diary')
+    @login_required
+    def diary_index():
+        """Serve the diary index page"""
+        return send_from_directory('static', 'diary.html')
+
+    @app.route('/diary/<int:diary_id>')
+    @login_required
+    def diary_view(diary_id):
+        """Serve the diary view page for a specific diary"""
+        from flask_login import current_user
+        from diary_services import get_diary
+        
+        # Check if diary exists and belongs to the user
+        diary_data = get_diary(current_user.id, diary_id)
+        if not diary_data:
+            flash('Diary not found', 'error')
+            return redirect(url_for('diary_index'))
+        
+        return send_from_directory('static', 'diary-view.html')
+
+    @app.route('/diary/<int:diary_id>/chat')
+    @app.route('/diary/<int:diary_id>/chat/<int:chat_id>')
+    @login_required
+    def diary_chat(diary_id, chat_id=None):
+        """Serve the chat view page for diary chats"""
+        # Check if diary exists and belongs to the user
+        from diary_services import get_diary
+        
+        diary_data = get_diary(current_user.id, diary_id)
+        if not diary_data:
+            flash('Diary not found', 'error')
+            return redirect(url_for('diary_index'))
+        
+        # Use the same chat-view.html for diary chats
+        return send_from_directory('static', 'chat-view.html')
 
 
-
+    @app.route('/diary/<int:diary_id>/chat')
+    @app.route('/diary/<int:diary_id>/chat/<int:chat_id>')
+    @login_required
+    def diary_chat_view(diary_id, chat_id=None):
+        """Serve the chat view page for diary chats"""
+        # Check if diary exists and belongs to the user
+        from diary_services import get_diary
+        
+        diary_data = get_diary(current_user.id, diary_id)
+        if not diary_data:
+            flash('Diary not found', 'error')
+            return redirect(url_for('diary_index'))
+        
+        # Use the same chat-view.html for diary chats
+        return send_from_directory('static', 'chat-view.html')
 
 
 
@@ -115,12 +172,6 @@ def create_app():
         return send_from_directory('static', path)
     
     return app
-
-
-
-
-
-
 
 if __name__ == '__main__':
     app = create_app()

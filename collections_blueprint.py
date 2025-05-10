@@ -4,6 +4,8 @@ from services import get_all_collections, get_collection, create_collection, del
 
 collections_bp = Blueprint('collections', __name__, url_prefix='/api/collections')
 
+diary_chat_bp = Blueprint('diary_chat', __name__, url_prefix='/api/diaries')
+
 @collections_bp.route('', methods=['GET'])
 @login_required
 def get_collections():
@@ -11,6 +13,95 @@ def get_collections():
     return jsonify({
         "success": True,
         "collections": collections
+    })
+
+@diary_chat_bp.route('/<int:diary_id>/chat', methods=['POST'])
+@login_required
+def create_diary_chat(diary_id):
+    chat, error = create_diary_chat_session(current_user.id, diary_id)
+    if error:
+        return jsonify({"success": False, "error": error}), 404
+    
+    return jsonify({
+        "success": True,
+        "chat": {
+            "id": chat.id,
+            "title": chat.title,
+            "diary_id": chat.diary_id,
+            "created_at": chat.created_at.isoformat(),
+            "updated_at": chat.updated_at.isoformat()
+        }
+    })
+
+@diary_chat_bp.route('/<int:diary_id>/chats', methods=['GET'])
+@login_required
+def get_diary_chats(diary_id):
+    chats = get_diary_chat_sessions(current_user.id, diary_id)
+    return jsonify({
+        "success": True,
+        "chats": [{
+            "id": chat.id,
+            "title": chat.title,
+            "diary_id": chat.diary_id,
+            "created_at": chat.created_at.isoformat(),
+            "updated_at": chat.updated_at.isoformat()
+        } for chat in chats]
+    })
+
+@diary_chat_bp.route('/<int:diary_id>/chat/<int:chat_id>/messages', methods=['GET'])
+@login_required
+def get_diary_chat_messages(diary_id, chat_id):
+    chat, messages = get_chat_messages(chat_id, current_user.id)
+    if not chat:
+        return jsonify({"success": False, "error": "Chat session not found"}), 404
+    
+    if chat.diary_id != diary_id:
+        return jsonify({"success": False, "error": "Chat does not belong to this diary"}), 404
+    
+    return jsonify({
+        "success": True,
+        "chat": {
+            "id": chat.id,
+            "title": chat.title,
+            "diary_id": chat.diary_id
+        },
+        "messages": [{
+            "id": msg.id,
+            "content": msg.content,
+            "is_user": msg.is_user,
+            "timestamp": msg.timestamp.isoformat(),
+            "relevant_entry_ids": msg.relevant_memory_ids.split(",") if msg.relevant_memory_ids else []
+        } for msg in messages]
+    })
+
+@diary_chat_bp.route('/<int:diary_id>/chat/<int:chat_id>/query', methods=['POST'])
+@login_required
+def process_diary_query(diary_id, chat_id):
+    data = request.json
+    query = data.get('query', '')
+    
+    if not query:
+        return jsonify({"success": False, "error": "Query is required"}), 400
+    
+    # Verify this chat belongs to this diary
+    chat = Chat.query.filter_by(
+        id=chat_id,
+        user_id=current_user.id,
+        diary_id=diary_id
+    ).first()
+    
+    if not chat:
+        return jsonify({"success": False, "error": "Chat not found for this diary"}), 404
+    
+    result, error = process_diary_chat_query(chat_id, current_user.id, query)
+    if error:
+        return jsonify({"success": False, "error": error}), 500
+    
+    return jsonify({
+        "success": True,
+        "query": result["query"],
+        "response": result["response"],
+        "relevant_entries": result["relevant_entries"]
     })
 
 @collections_bp.route('', methods=['POST'])

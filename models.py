@@ -1,5 +1,3 @@
-
-
 from extensions import db, login_manager
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -20,13 +18,14 @@ class User(UserMixin, db.Model):
 class Chat(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    collection_id = db.Column(db.String(36), nullable=False)
-    memory_id = db.Column(db.String(36), nullable=True)  # Add this line
+    collection_id = db.Column(db.String(36), nullable=True)  # Make nullable for diary chats
+    memory_id = db.Column(db.String(36), nullable=True)
+    diary_id = db.Column(db.Integer, db.ForeignKey('diary.id'), nullable=True)  # Add this line
     title = db.Column(db.String(200), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     messages = db.relationship('ChatMessage', backref='chat', lazy=True, cascade="all, delete-orphan")
-
+    
 class ChatMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     chat_id = db.Column(db.Integer, db.ForeignKey('chat.id'), nullable=False)
@@ -34,6 +33,24 @@ class ChatMessage(db.Model):
     is_user = db.Column(db.Boolean, nullable=False, default=True)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     relevant_memory_ids = db.Column(db.String(200))  # Comma-separated memory IDs
+
+class Diary(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    name = db.Column(db.String(200), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    entries = db.relationship('DiaryEntry', backref='diary', lazy=True, cascade="all, delete-orphan")
+
+class DiaryEntry(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    diary_id = db.Column(db.Integer, db.ForeignKey('diary.id'), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    text = db.Column(db.Text, nullable=False)
+    caption = db.Column(db.String(500))
+    image_path = db.Column(db.String(500))
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
 @login_manager.user_loader
 def load_user(user_id):

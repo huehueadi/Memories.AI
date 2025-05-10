@@ -190,11 +190,35 @@ def process_memory(user_id, collection_id, file, memory_type, title, description
         
         # Extract text based on memory type
         memory_text = ""
+        diarization_data = None
         
         if memory_type == 'audio':
-            # Transcribe audio to text
-            result = whisper_model.transcribe(file_path)
-            memory_text = result["text"]
+            try:
+                # Try using the advanced diarization functionality
+                from upload_blueprint import process_audio_file_with_diarization
+                
+                print(f"Processing audio with diarization: {file_path}")
+                diarization_result = process_audio_file_with_diarization(file_path)
+                
+                if "error" in diarization_result:
+                    # If diarization had an error but returned transcript
+                    print(f"Diarization warning: {diarization_result['error']}")
+                    memory_text = diarization_result.get("full_transcript", "")
+                    # Store partial diarization data if available
+                    diarization_data = diarization_result.get("segments", [])
+                else:
+                    # Successful diarization
+                    memory_text = diarization_result.get("full_transcript", "")
+                    diarization_data = diarization_result.get("segments", [])
+                
+                print(f"Diarization completed with {len(diarization_data) if diarization_data else 0} segments")
+                
+            except Exception as e:
+                # Fallback to original Whisper transcription
+                print(f"Diarization failed, falling back to basic transcription: {str(e)}")
+                result = whisper_model.transcribe(file_path)
+                memory_text = result["text"]
+        
         elif memory_type == 'pdf':
             # Extract text from PDF
             memory_text = extract_text_from_pdf(file_path)
@@ -213,6 +237,11 @@ def process_memory(user_id, collection_id, file, memory_type, title, description
             "original_filename": filename,
             "created_at": datetime.now().isoformat(),
         }
+        
+        # Add diarization data if available
+        if memory_type == 'audio' and diarization_data:
+            memory_metadata["has_diarization"] = True
+            memory_metadata["diarization_segments"] = diarization_data
         
         # Generate embedding for memory text
         try:
@@ -312,7 +341,7 @@ def generate_response(query, relevant_memories):
         """
         
         output = ollama.generate(
-            model="llama3.2:1b",  # Using a lightweight model - can be changed based on available models
+            model="llama3",  # Using a lightweight model - can be changed based on available models
             prompt=prompt
         )
         
@@ -365,3 +394,80 @@ def query_specific_memory(user_id, collection_id, memory_id, query_text):
         import traceback
         print(f"DEBUG: Traceback: {traceback.format_exc()}")
         return None, str(e)
+
+def delete_memory(user_id, collection_id, memory_id):
+    """Delete a memory from a collection"""
+    try:
+        # Get the collection
+        collection = get_collection(user_id, collection_id)
+        if not collection:
+            return False, "Collection not found"
+        
+        # Find the memory in the collection
+        memory_index = None
+        for i, memory in enumerate(collection.get("memories", [])):
+            if memory["id"] == memory_id:
+                memory_index = i
+                break
+        
+        if memory_index is None:
+            return False, "Memory not found"
+        
+        # Remove the memory from collection metadata
+        memory = collection["memories"].pop(memory_index)
+        
+        # Delete the memory files from disk
+        memory_dir = get_collection_documents_path(user_id, collection_id)
+        
+        # Delete the original file
+        original_file = os.path.join(memory_dir, memory["filename"])
+        if os.path.exists(original_file):
+            os.remove(original_file)
+        
+        # Delete the text content file
+        text_file = os.path.join(memory_dir, f"{memory_id}.txt")
+        if os.path.exists(text_file):
+            os.remove(text_file)
+        
+        # Save the updated collection metadata
+        with open(get_collection_metadata_path(user_id, collection_id), 'w') as f:
+            json.dump(collection, f)
+        
+        # Update FAISS index
+        # This is more complex as you'd need to rebuild the index without the deleted embedding
+        # For simplicity, you might want to just rebuild the entire index
+        rebuild_collection_index(user_id, collection_id)
+        
+        return True, None
+    except Exception as e:
+        return False, str(e)
+
+def rebuild_collection_index(user_id, collection_id):
+    """Rebuild the FAISS index for a collection"""
+    collection = get_collection(user_id, collection_id)
+    if not collection:
+        return False
+    
+    # Create a new empty index
+    index = faiss.IndexFlatL2(EMBEDDING_DIMENSION)
+    
+    # Add all memories back to the index
+    for memory in collection.get("memories", []):
+        memory_dir = get_collection_documents_path(user_id, collection_id)
+        text_path = os.path.join(memory_dir, f"{memory['id']}.txt")
+        
+        # Read the memory text content
+        with open(text_path, 'r', encoding='utf-8') as f:
+            memory_text = f.read()
+        
+        # Generate embedding
+        response = ollama.embeddings(model="nomic-embed-text", prompt=memory_text)
+        embedding = response["embedding"]
+        
+        # Add to index
+        index.add(np.array([embedding]).astype('float32'))
+    
+    # Save the updated index
+    faiss.write_index(index, get_collection_index_path(user_id, collection_id))
+    
+    return True
